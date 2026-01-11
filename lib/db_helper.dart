@@ -26,4 +26,14 @@ class DBHelper {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_namesKey);
   }
+
+  static Future<void> editName(String oldName, String newName) async {
+    final prefs = await SharedPreferences.getInstance();
+    final names = prefs.getStringList(_namesKey) ?? [];
+    final index = names.indexOf(oldName);
+    if (index != -1) {
+      names[index] = newName;
+      await prefs.setStringList(_namesKey, names);
+    }
+  }
 }

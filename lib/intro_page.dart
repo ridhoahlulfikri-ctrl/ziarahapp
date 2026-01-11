@@ -109,10 +109,15 @@ class _IntroPageState extends State<IntroPage> {
                           width: 3,
                         ),
                       ),
-                      child: const CircleAvatar(
+                      child: CircleAvatar(
                         radius: 50,
-                        backgroundImage: AssetImage(
-                          'assets/foto/megawati.jpeg',
+                        backgroundImage: const AssetImage(
+                          'assets/foto/Icon.png',
+                        ),
+                        child: const Icon(
+                          Icons.person,
+                          size: 50,
+                          color: Colors.white,
                         ),
                       ),
                     ),

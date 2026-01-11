@@ -26,6 +26,11 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> editName(String oldName, String newName) async {
+    await DBHelper.editName(oldName, newName);
+    loadNames();
+  }
+
   Future<void> deleteName(String name) async {
     await DBHelper.deleteName(name);
     loadNames();
@@ -263,20 +268,50 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     subtitle: const Text(
-                      "Ketuk untuk memulai doa",
+                      "Ketuk tombol detail untuk melihat doa",
                       style: TextStyle(fontSize: 12, color: Colors.grey),
                     ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () => deleteName(name),
-                      tooltip: 'Hapus',
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            Icons.visibility,
+                            color: Color(0xFF4CAF50),
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => DoaPage(nama: name),
+                              ),
+                            );
+                          },
+                          tooltip: 'Lihat Detail',
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () async {
+                            final newName = await showDialog<String>(
+                              context: context,
+                              builder: (context) =>
+                                  EditNameDialog(initialName: name),
+                            );
+                            if (newName != null &&
+                                newName.isNotEmpty &&
+                                newName != name) {
+                              editName(name, newName);
+                            }
+                          },
+                          tooltip: 'Edit',
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => deleteName(name),
+                          tooltip: 'Hapus',
+                        ),
+                      ],
                     ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => DoaPage(nama: name)),
-                      );
-                    },
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
@@ -287,6 +322,55 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class EditNameDialog extends StatefulWidget {
+  const EditNameDialog({super.key, required this.initialName});
+
+  final String initialName;
+
+  @override
+  State<EditNameDialog> createState() => _EditNameDialogState();
+}
+
+class _EditNameDialogState extends State<EditNameDialog> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialName);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Edit Nama'),
+      content: TextField(
+        controller: _controller,
+        decoration: const InputDecoration(
+          labelText: 'Nama',
+          border: OutlineInputBorder(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, _controller.text.trim()),
+          child: const Text('Simpan'),
+        ),
+      ],
     );
   }
 }
