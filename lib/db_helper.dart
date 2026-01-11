@@ -1,43 +1,29 @@
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DBHelper {
-  static Database? _db;
+  static const String _namesKey = 'names';
 
-  static Future<Database> get database async {
-    if (_db != null) return _db!;
-    _db = await initDB();
-    return _db!;
+  static Future<void> addNama(String nama) async {
+    final prefs = await SharedPreferences.getInstance();
+    final names = prefs.getStringList(_namesKey) ?? [];
+    names.add(nama);
+    await prefs.setStringList(_namesKey, names);
   }
 
-  static Future<Database> initDB() async {
-    return openDatabase(
-      join(await getDatabasesPath(), 'ziarah.db'),
-      version: 1,
-      onCreate: (db, version) async {
-        await db.execute('''
-          CREATE TABLE ziarah(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nama TEXT
-          )
-        ''');
-      },
-    );
+  static Future<List<String>> getNames() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(_namesKey) ?? [];
   }
 
-  static Future<int> insertNama(String nama) async {
-    final db = await database;
-    return db.insert('ziarah', {'nama': nama});
-  }
-
-  static Future<Map<String, dynamic>> getLastData() async {
-    final db = await database;
-    final res = await db.query('ziarah', orderBy: 'id DESC', limit: 1);
-    return res.first;
+  static Future<void> deleteName(String nama) async {
+    final prefs = await SharedPreferences.getInstance();
+    final names = prefs.getStringList(_namesKey) ?? [];
+    names.remove(nama);
+    await prefs.setStringList(_namesKey, names);
   }
 
   static Future<void> deleteAll() async {
-    final db = await database;
-    await db.delete('ziarah');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_namesKey);
   }
 }

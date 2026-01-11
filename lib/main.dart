@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'intro_page.dart';
+import 'home_page.dart';
 
 void main() {
   runApp(const ZiarahApp());
@@ -12,7 +12,7 @@ class ZiarahApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const IntroPage(),
+      home: const HomePage(),
     );
   }
 }
